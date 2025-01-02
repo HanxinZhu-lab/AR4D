@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="AR4D: Autoregressive 4D Generation from Monocular Videos.">
+  <meta name="keywords" content="4D Generation.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AR4D: Autoregressive 4D Generation from Monocular Videos</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <style>
+  .videos {
+    display: flex;  /* 使用flexbox */
+    flex-wrap: nowrap;  /* 防止换行 */
+    justify-content: center; /* 水平居中视频块 */
+    align-items: center; /* 垂直居中视频块 */
+    /* height: 100vh; 让容器的高度占满视口 */
+  }
+
+  .video {
+    margin: 0;  /* 给每个视频块添加一点水平间隔 */
+    text-align: center;  /* 居中文本 */
+  }
+
+  .video p {
+    font-weight: normal;  /* 加粗字体 */
+  }
+
+  .text-container {
+  display: flex;            /* 使用flexbox */
+  justify-content: center;  /* 水平居中 */
+  align-items: center;      /* 垂直居中 */
+  /* height: 100vh;            占满视口高度 */
+  text-align: center;       /* 使文本在其容器内居中 */
+}
+
+.custom-font-size {
+  font-size: 18px; /* 自定义字体大小 */
+  font-weight: normal; /* 你可以根据需要设置字体加粗或不加粗 */
+  margin-top: -40px;         /* 将文本向上移动50px，调整此值以改变移动距离 */
+}
+
+.title {
+  text-align: center;  /* 水平居中 */
+  margin-bottom: 20px;  /* 给标题和视频之间增加一点空间 */
+}
+
+.subtitle {
+  text-align: center;  /* 水平居中 */
+  margin-bottom: 30px;  /* 给子标题和视频块之间增加空间 */
+  font-weight: bold;  /* 子标题的默认字体粗细 */
+}
+  </style>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">AR4D: Autoregressive 4D Generation from Monocular Videos</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=MbVZAGQAAAAJ&hl=zh-CN">Hanxin Zhu</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=P08KU1YAAAAJ&hl=zh-CN">Tianyu He</a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=CKWKIscAAAAJ&hl=en">Xiqian Yu</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com.sg/citations?user=S88C9ewAAAAJ&hl=zh-CN">Junliang Guo</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=1ayDJfsAAAAJ&hl=zh-CN">Zhibo Chen</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=pZBEnY8AAAAJ&hl=zh-CN">Jiang Bian</a><sup>2</sup>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>University of Science and Technology of China,</span>
+            <span class="author-block"><sup>2</sup>Microsoft Research Asia</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://scholar.google.com/citations?user=MbVZAGQAAAAJ&hl=zh-CN"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://scholar.google.com/citations?user=MbVZAGQAAAAJ&hl=zh-CN"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Video Link. -->
+              <!-- <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span> -->
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://scholar.google.com/citations?user=MbVZAGQAAAAJ&hl=zh-CN"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming soon) </span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <!-- <span class="link-block">
+                <a href="https://github.com/google/nerfies/releases/tag/0.1"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-images"></i>
+                  </span>
+                  <span>Data</span>
+                  </a> -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<div class="text-container">
+  <p class="custom-font-size">
+    <strong>TL;DR:</strong> We present a novel method for 4D generation from monocular videos without relying on SDS, </br> delivering greater diversity, improved spatial-temporal consistency, and better alignment with input prompts.
+  </p>
+</div>
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ref_video_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(a) Input Video</p>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/test_video_0_novel_view_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(b) Novel-view Video 1</p>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/test_video_0_ref.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p>(c) Reconstructed Input Video</p>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/test_video_0_novel_view_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(d) Novel-view Video 2</p>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ref_video_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(a) Input Video</p>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/test_video_1_novel_view_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(b) Novel-view Video 1</p>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/test_video_1_ref.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p>(c) Reconstructed Input Video</p>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/test_video_1_novel_view_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(d) Novel-view Video 2</p>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ref_video_2.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(a) Input Video</p>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/test_video_2_novel_view_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(b) Novel-view Video 1</p>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/test_video_2_ref.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p>(c) Reconstructed Input Video</p>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/test_video_2_novel_view_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(d) Novel-view Video 2</p>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Recent advancements in generative models have ignited substantial interest in dynamic 3D content creation (\ie, 4D generation). Existing approaches primarily rely on Score Distillation Sampling (SDS) to infer novel-view videos, typically leading to issues such as limited diversity, spatial-temporal inconsistency and poor prompt alignment, due to the inherent randomness of SDS. To tackle these problems, we propose AR4D, a novel paradigm for SDS-free 4D generation. Specifically, our paradigm consists of three stages. To begin with, for a monocular video that is either generated or captured, we first utilize pre-trained expert models to create a 3D representation of the first frame, which is further fine-tuned to serve as the canonical space. Subsequently, motivated by the fact that videos happen naturally in an autoregressive manner, we propose to generate each frame's 3D representation based on its previous frame's representation, as this autoregressive generation manner can facilitate  more accurate geometry and motion estimation. Meanwhile, to prevent overfitting during this process, we introduce a progressive view sampling strategy, utilizing priors from pre-trained large-scale 3D reconstruction models. To avoid appearance drift introduced by autoregressive generation, we further incorporate a refinement stage based on a global deformation field and the geometry of each frame’s 3D representation. Extensive experiments have demonstrated that AR4D can achieve state-of-the-art 4D generation without SDS, delivering greater diversity, improved spatial-temporal consistency, and better alignment with input prompts.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Method</h2>
+        <div class="content has-text-justified">
+          <div class="image-container">
+            <img src="./static/method/framework.png"
+                 class="interpolation-image"
+                 alt="Interpolate start reference image."/>
+          </div>
+          <p>
+            <strong>Illustration of our method.</strong> To enable SDS-free 4D generation, we propose a three-stage approach consisting of Initialization, Generation, and Refinement. 
+          </p>
+        </div>
+      </div>
+    </div>
+</section>
+
+
+
+<h2 class="title is-3">Comparisons with SOTA methods</h2> 
+<h3 class="subtitle is-5">Scene 1</h3> 
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_0.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_0.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_2.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(a) Consistent4D</p>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_2.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(b) SV4D</p>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_2.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p>(c) STAG4D</p>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_2.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p><strong>(d) AR4D (Ours)</strong></p>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<h3 class="subtitle is-5">Scene 2</h3> 
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_3.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_3.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_3.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_3.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_4.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_4.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_4.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_4.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_5.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(a) Consistent4D</p>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_5.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(b) SV4D</p>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_5.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p>(c) STAG4D</p>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_5.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p><strong>(d) AR4D (Ours)</strong></p>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<h3 class="subtitle is-5">Scene 3</h3> 
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_6.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_6.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_6.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_6.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_7.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_7.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_7.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_7.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+<div class="videos">
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/consistent4d_8.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(a) Consistent4D</p>
+  </div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/sv4d_8.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p>(b) SV4D</p>
+  </div>
+  <div class="video">
+    <video controls loop autoplay muted width="256" height="256">
+        <source src="./static/videos/stag4d_8.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p>(c) STAG4D</p>
+</div>
+  <div class="video">
+      <video controls loop autoplay muted width="256" height="256">
+          <source src="./static/videos/ours_8.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+      <p><strong>(d) AR4D (Ours)</strong></p>
+  </div>
+  <!-- Add other video blocks as needed -->
+</div>
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+
+    <!-- Concurrent Work. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Acknowledgements</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Our work is motivated by the following excellent works:
+          </p>
+          <p>
+            <a href="https://consistent4d.github.io/">Consistent4D: Consistent 360° Dynamic Object Generation from Monocular Video</a>
+          </p>
+          <p>
+            <a href="https://nju-3dv.github.io/projects/STAG4D/">STAG4D: Spatial-Temporal Anchored Generative 4D Gaussians</a> 
+          </p>
+          <p>
+            <a href="https://sv4d.github.io/">SV4D: Dynamic 3D Content Generation with Multi-Frame and Multi-View Consistency</a> 
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Concurrent Work. -->
+
+  </div>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{zhu2024ar4d,
+  author    = {Zhu, Hanxin and He, Tianyu and Yu, Xiqian and Guo, Junliang and Chen, Zhibo and Bian, Jiang},
+  title     = {AR4D: Autoregressive 4D Generation from Monocular Videos},
+  journal   = {arXiv},
+  year      = {2024},
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <!-- <a class="icon-link" -->
+      <!--    href="./static/videos/nerfies_paper.pdf"> -->
+      <!--   <i class="fas fa-file-pdf"></i> -->
+      <!-- </a> -->
+      <!-- <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled> -->
+      <!--   <i class="fab fa-github"></i> -->
+      <!-- </a> -->
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+          We thank <a href=https://nerfies.github.io/> Nerfies </a> for their sharing of this nice template.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
